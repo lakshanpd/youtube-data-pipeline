@@ -1,0 +1,19 @@
+youtube:
+  search:
+    region_code: "LK"
+    parts: "snippet"
+    order: "date"
+    max_results_per_page: 50
+    max_videos_per_run: 200
+    keywords:
+      - "Sri Lanka news"
+      - "Sri Lanka music"
+      - "Sri Lanka"
+      - "Lanka"
+      - "Colombo"
+      - "ශ්‍රී ලංකා"        # Sinhala script
+      - "இலங்கை"             # Tamil script
+
+  videos:
+    parts: "snippet,statistics,contentDetails"
+    max_ids_per_request: 50  # YouTube API hard limit
