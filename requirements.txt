@@ -1,0 +1,8 @@
+# Runtime
+google-api-python-client>=2.100.0
+python-dotenv>=1.0.0
+pyyaml>=6.0.0
+
+# Testing
+pytest>=7.4.0
+pytest-mock>=3.12.0
