@@ -153,7 +153,7 @@ class IngestionOrchestrator:
         )
         return summary
     
-# manual test
+# integration test for orchestrator
 if __name__ == "__main__":
     import os
     from dotenv import load_dotenv

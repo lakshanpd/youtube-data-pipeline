@@ -65,7 +65,7 @@ class VideoAPIClient:
                 raise QuotaExceededError("YouTube API quota exceeded") from exc
             raise
 
-# manual test
+# integration test for VideoAPIClient
 if __name__ == "__main__":
     import os
     from dotenv import load_dotenv

@@ -42,7 +42,7 @@ def extract_video_records(video_response: dict) -> list[dict]:
     """
     return video_response.get("items", [])
 
-# manual test
+# integration test for extractor functions
 if __name__ == "__main__":
     import os
     from dotenv import load_dotenv
