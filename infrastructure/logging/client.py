@@ -164,19 +164,3 @@ class PipelineLogger:
         handler.setLevel(level)
         handler.setFormatter(formatter)
         self._logger.addHandler(handler)
-
-# integration test for PipelineLogger
-if __name__ == "__main__":
-    # 1st run
-    logger = PipelineLogger(run_id="test_run_001", phase="ingestion")
-    logger.info("This is an info message.")
-    logger.warning("This is a warning message.")
-    logger.error("This is an error message.")
-    logger.close()
-
-    # 2nd run
-    logger = PipelineLogger(run_id="test_run_002", phase="processing")
-    logger.info("This is an info message.")
-    logger.warning("This is a warning message.")
-    logger.error("This is an error message.")
-    logger.close()
