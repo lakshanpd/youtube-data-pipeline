@@ -21,16 +21,19 @@ class IngestionOrchestrator:
         search_client: SearchAPIClient,
         video_client: VideoAPIClient,
         config: dict,
+        catalog_client: object | None = None,
     ):
         """
         Args:
             search_client: Configured ``SearchAPIClient`` instance.
             video_client:  Configured ``VideoAPIClient`` instance.
             config:        Full ``youtube`` section of config.yaml.
+            catalog_client: Optional ``CatalogClient`` for metadata tracking.
         """
         self._search = search_client
         self._video = video_client
         self._cfg = config
+        self._catalog = catalog_client
 
     # ------------------------------------------------------------------
     # Public API
@@ -71,6 +74,19 @@ class IngestionOrchestrator:
         search_responses: list[dict] = []
         video_responses: list[dict] = []
         status = "completed"
+        catalog_run_id: int | None = None
+        catalog_dataset_id: str | None = None
+        unexpected_error = False
+
+        if self._catalog:
+            catalog_run_id = self._catalog.start_pipeline_run()
+            catalog_cfg = self._cfg.get("catalog", {})
+            catalog_dataset_id = self._catalog.register_dataset(
+                name=catalog_cfg.get("dataset_name", "youtube_ingestion_raw"),
+                layer=catalog_cfg.get("layer", "raw"),
+                bucket=catalog_cfg.get("bucket", "raw"),
+                source=catalog_cfg.get("source", "youtube_data_api"),
+            )
 
         try:
             for keyword in keywords:
@@ -96,6 +112,17 @@ class IngestionOrchestrator:
                         page_token=page_token,
                     )
                     search_responses.append(search_response)
+                    if self._catalog and catalog_run_id is not None and catalog_dataset_id is not None:
+                        search_batch_id = self._catalog.start_batch(
+                            catalog_dataset_id,
+                            catalog_run_id,
+                            f"youtube/{date}/search_{keyword}_{len(search_responses)}.json",
+                        )
+                        self._catalog.complete_batch(
+                            search_batch_id,
+                            status="completed",
+                            record_count=len(search_response.get("items", [])),
+                        )
 
                     # --- Extract & deduplicate IDs ---
                     new_ids = [
@@ -117,6 +144,17 @@ class IngestionOrchestrator:
                         )
                         video_response = self._video.get_video_details(batch)
                         video_responses.append(video_response)
+                        if self._catalog and catalog_run_id is not None and catalog_dataset_id is not None:
+                            video_batch_id = self._catalog.start_batch(
+                                catalog_dataset_id,
+                                catalog_run_id,
+                                f"youtube/{date}/videos_{keyword}_{len(video_responses)}.json",
+                            )
+                            self._catalog.complete_batch(
+                                video_batch_id,
+                                status="completed",
+                                record_count=len(extract_video_records(video_response)),
+                            )
                         logger.info(
                             "Video details fetched | run_id=%s | records=%d",
                             run_id, len(extract_video_records(video_response)),
@@ -133,6 +171,13 @@ class IngestionOrchestrator:
                 "Quota exceeded, stopping early | run_id=%s | total_collected=%d",
                 run_id, len(all_video_ids),
             )
+        except Exception:
+            unexpected_error = True
+            raise
+        finally:
+            if self._catalog and catalog_run_id is not None:
+                pipeline_status = "completed" if status == "completed" and not unexpected_error else "failed"
+                self._catalog.complete_pipeline_run(catalog_run_id, status=pipeline_status)
 
         summary = {
             "run_id": run_id,

@@ -60,6 +60,68 @@ def _make_orchestrator(
 # ---------------------------------------------------------------------------
 
 class TestIngestionOrchestratorRun:
+    def test_catalog_pipeline_lifecycle_completed(self):
+        search_client = MagicMock()
+        video_client = MagicMock()
+        catalog_client = MagicMock()
+
+        search_client.search.side_effect = [_search_response([]), _search_response([])]
+        orchestrator = IngestionOrchestrator(
+            search_client,
+            video_client,
+            ORCH_CONFIG,
+            catalog_client=catalog_client,
+        )
+
+        orchestrator.run("2024-01-01")
+
+        catalog_client.start_pipeline_run.assert_called_once()
+        catalog_client.register_dataset.assert_called_once()
+        catalog_client.complete_pipeline_run.assert_called_once_with(
+            catalog_client.start_pipeline_run.return_value,
+            status="completed",
+        )
+
+    def test_catalog_pipeline_marked_failed_on_quota_exceeded(self):
+        search_client = MagicMock()
+        video_client = MagicMock()
+        catalog_client = MagicMock()
+
+        search_client.search.side_effect = QuotaExceededError("quota")
+        orchestrator = IngestionOrchestrator(
+            search_client,
+            video_client,
+            ORCH_CONFIG,
+            catalog_client=catalog_client,
+        )
+
+        summary = orchestrator.run("2024-01-01")
+
+        assert summary["status"] == "quota_exceeded"
+        catalog_client.complete_pipeline_run.assert_called_once_with(
+            catalog_client.start_pipeline_run.return_value,
+            status="failed",
+        )
+
+    def test_catalog_batches_created_for_search_and_video_payloads(self):
+        search_client = MagicMock()
+        video_client = MagicMock()
+        catalog_client = MagicMock()
+
+        search_client.search.side_effect = [_search_response(["v1"]), _search_response([])]
+        video_client.get_video_details.side_effect = [_video_response(["v1"])]
+        orchestrator = IngestionOrchestrator(
+            search_client,
+            video_client,
+            ORCH_CONFIG,
+            catalog_client=catalog_client,
+        )
+
+        orchestrator.run("2024-01-01")
+
+        assert catalog_client.start_batch.call_count == 3
+        assert catalog_client.complete_batch.call_count == 3
+
     def test_returns_summary_keys(self):
         orch, sc, vc = _make_orchestrator(
             search_side_effect=[_search_response(["v1"]), _search_response(["v2"])],
