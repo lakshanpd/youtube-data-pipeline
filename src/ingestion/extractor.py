@@ -40,27 +40,4 @@ def extract_video_records(video_response: dict) -> list[dict]:
     Args:
         video_response: Raw dict returned by ``VideoAPIClient.get_video_details()``.
     """
-    return video_response.get("items", [])
-
-# integration test for extractor functions
-if __name__ == "__main__":
-    import os
-    from dotenv import load_dotenv
-
-    load_dotenv()
-    api_key = os.getenv("YOUTUBE_API_KEY")
-    config = {
-        "parts": "id,snippet",
-        "region_code": "US",
-        "max_results_per_page": 5,
-        "order": "date",
-    }
-    client = SearchAPIClient(api_key, config)
-    response = client.search(
-        query="python programming",
-        published_after="2024-01-01T00:00:00Z",
-        published_before="2024-01-31T23:59:59Z",
-    )
-
-    print("extract_video_ids:", extract_video_ids(response))   
-    print("extract_next_page_token:", extract_next_page_token(response))   
+    return video_response.get("items", []) 
