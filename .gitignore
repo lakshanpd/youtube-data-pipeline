@@ -18,5 +18,8 @@ infrastructure/minio/data/*
 infrastructure/postgres/data/*
 !infrastructure/postgres/data/.gitkeep
 
+# Pipeline log files (generated at runtime)
+infrastructure/logging/logs/*.log
+
 # Jupyter
 .ipynb_checkpoints/
