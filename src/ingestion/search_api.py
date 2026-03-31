@@ -67,23 +67,3 @@ class SearchAPIClient:
                 raise QuotaExceededError("YouTube API quota exceeded") from exc
             raise
 
-# integration test for SearchAPIClient
-if __name__ == "__main__":
-    import os
-    from dotenv import load_dotenv
-
-    load_dotenv()
-    api_key = os.getenv("YOUTUBE_API_KEY")
-    config = {
-        "parts": "id,snippet",
-        "region_code": "US",
-        "max_results_per_page": 5,
-        "order": "date",
-    }
-    client = SearchAPIClient(api_key, config)
-    response = client.search(
-        query="python programming",
-        published_after="2024-01-01T00:00:00Z",
-        published_before="2024-01-31T23:59:59Z",
-    )
-    print(response)

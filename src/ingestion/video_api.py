@@ -64,31 +64,3 @@ class VideoAPIClient:
             if exc.resp.status == 403:
                 raise QuotaExceededError("YouTube API quota exceeded") from exc
             raise
-
-# integration test for VideoAPIClient
-if __name__ == "__main__":
-    import os
-    from dotenv import load_dotenv
-
-    load_dotenv()
-    api_key = os.getenv("YOUTUBE_API_KEY")
-    search_config = {
-        "parts": "id,snippet",
-        "region_code": "US",
-        "max_results_per_page": 1,
-        "order": "date",
-    }
-    video_config = {
-        "parts": "snippet,statistics,contentDetails",
-        "max_ids_per_request": 50,
-    }
-    search_client = SearchAPIClient(api_key, search_config)
-    video_client = VideoAPIClient(api_key, video_config)
-    response = search_client.search(
-        query="python programming",
-        published_after="2024-01-01T00:00:00Z",
-        published_before="2024-01-31T23:59:59Z",
-    )
-    video_ids = extract_video_ids(response)
-    video_details = video_client.get_video_details(video_ids)
-    print("video_details:", video_details)

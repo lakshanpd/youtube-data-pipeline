@@ -153,27 +153,3 @@ class IngestionOrchestrator:
         )
         return summary
     
-# integration test for orchestrator
-if __name__ == "__main__":
-    import os
-    from dotenv import load_dotenv
-
-    load_dotenv()
-    api_key = os.getenv("YOUTUBE_API_KEY")
-    search_config = {
-        "parts": "id,snippet",
-        "region_code": "US",
-        "max_results_per_page": 5,
-        "order": "date",
-        "keywords": ["python programming", "data science"],
-        "max_videos_per_run": 10,
-    }
-    video_config = {
-        "parts": "snippet,statistics,contentDetails",
-        "max_ids_per_request": 5,
-    }
-    search_client = SearchAPIClient(api_key, search_config)
-    video_client = VideoAPIClient(api_key, video_config)
-    orchestrator = IngestionOrchestrator(search_client, video_client, {"search": search_config, "videos": video_config})
-    summary = orchestrator.run(date="2024-01-01")
-    print("Ingestion summary:", summary)
