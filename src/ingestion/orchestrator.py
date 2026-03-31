@@ -198,3 +198,54 @@ class IngestionOrchestrator:
         )
         return summary
     
+
+if __name__ == "__main__":
+    import os
+
+    from dotenv import load_dotenv
+
+    from infrastructure.postgres.client import CatalogClient
+
+    load_dotenv()
+    api_key = os.getenv("YOUTUBE_API_KEY")
+    if not api_key:
+        raise RuntimeError("YOUTUBE_API_KEY not set in environment")
+
+    search_config = {
+        "parts": "id,snippet",
+        "region_code": "US",
+        "max_results_per_page": 5,
+        "order": "date",
+        "keywords": ["python programming"],
+        "max_videos_per_run": 10,
+    }
+    video_config = {
+        "parts": "snippet,statistics,contentDetails",
+        "max_ids_per_request": 5,
+    }
+    catalog_config = {
+        "dataset_name": "youtube_ingestion_raw",
+        "layer": "raw",
+        "bucket": "raw",
+        "source": "youtube_data_api",
+    }
+    postgres_config = {
+        "host": os.getenv("POSTGRES_HOST", "localhost"),
+        "port": int(os.getenv("POSTGRES_PORT", 5432)),
+        "dbname": os.getenv("POSTGRES_DB", "youtube_pipeline"),
+        "user": os.getenv("POSTGRES_USER", "pipeline"),
+        "password": os.getenv("POSTGRES_PASSWORD", "pipeline"),
+    }
+
+    search_client = SearchAPIClient(api_key, search_config)
+    video_client = VideoAPIClient(api_key, video_config)
+
+    with CatalogClient(postgres_config) as catalog_client:
+        orchestrator = IngestionOrchestrator(
+            search_client,
+            video_client,
+            {"search": search_config, "videos": video_config, "catalog": catalog_config},
+            catalog_client=catalog_client,
+        )
+        summary = orchestrator.run(date="2024-01-01")
+        print("Ingestion summary:", summary)
