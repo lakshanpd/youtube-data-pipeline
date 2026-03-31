@@ -17,3 +17,9 @@ youtube:
   videos:
     parts: "snippet,statistics,contentDetails"
     max_ids_per_request: 50  # YouTube API hard limit
+
+minio:
+  endpoint: "localhost:9000"
+  access_key: ${MINIO_ROOT_USER}      # resolved from .env
+  secret_key: ${MINIO_ROOT_PASSWORD}  # resolved from .env
+  secure: false                        # true in production (HTTPS)

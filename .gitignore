@@ -10,5 +10,9 @@ __pycache__/
 *.pyo
 .pytest_cache/
 
+# MinIO data (bind mount — can grow large)
+infrastructure/minio/data/*
+!infrastructure/minio/data/.gitkeep
+
 # Jupyter
 .ipynb_checkpoints/
