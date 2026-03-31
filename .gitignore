@@ -14,5 +14,9 @@ __pycache__/
 infrastructure/minio/data/*
 !infrastructure/minio/data/.gitkeep
 
+# PostgreSQL data (bind mount — managed by Docker)
+infrastructure/postgres/data/*
+!infrastructure/postgres/data/.gitkeep
+
 # Jupyter
 .ipynb_checkpoints/

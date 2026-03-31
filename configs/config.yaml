@@ -23,3 +23,10 @@ minio:
   access_key: ${MINIO_ROOT_USER}      # resolved from .env
   secret_key: ${MINIO_ROOT_PASSWORD}  # resolved from .env
   secure: false                        # true in production (HTTPS)
+
+postgres:
+  host: ${POSTGRES_HOST}         # resolved from .env
+  port: ${POSTGRES_PORT}         # resolved from .env — 5433 locally to avoid clash with Homebrew Postgres
+  dbname: ${POSTGRES_DB}         # resolved from .env
+  user: ${POSTGRES_USER}         # resolved from .env
+  password: ${POSTGRES_PASSWORD} # resolved from .env
