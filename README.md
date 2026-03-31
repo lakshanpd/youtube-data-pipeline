@@ -8,8 +8,8 @@ This project aims to analyze YouTube video trends and user behavior in Sri Lanka
 
 The project focuses on three main questions:
 
-1. **Most Popular Video Categories**  
-   Identify which categories of videos (e.g., music, education, entertainment, vlogs) are most popular among Sri Lankan viewers. Popularity will be measured through engagement metrics such as views, likes, and comments.
+1. **Analyse Most Popular Video Categories**  
+   Analyse which categories of videos (e.g., music, education, entertainment, vlogs) are most popular among Sri Lankan viewers. Popularity will be measured through engagement metrics such as views, likes, and comments.
 
 2. **User Activity Patterns**  
    Determine the time periods when users in Sri Lanka are most active on YouTube. This will help understand peak viewing hours and daily/weekly trends in audience behavior.
