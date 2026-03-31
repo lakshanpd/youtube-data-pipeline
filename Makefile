@@ -34,16 +34,16 @@ test:				## Run all tests
 	$(PYTEST) tests/ -v
 
 .PHONY: test-ingestion
-test-ingestion:			## Run ingestion tests only
-	$(PYTEST) tests/ingestion/ -v
+unit-test-ingestion:			## Run ingestion tests only
+	$(PYTEST) tests/unit/ingestion/ -v
 
 .PHONY: test-minio
-test-minio:			## Run MinIO client tests only
-	$(PYTEST) tests/infrastructure/minio/ -v
+unit-test-minio:			## Run MinIO client tests only
+	$(PYTEST) tests/unit/infrastructure/minio/ -v
 
 .PHONY: test-fast
-test-fast:			## Run all tests, stop on first failure
-	$(PYTEST) tests/ -v -x
+unit-test-fast:			## Run all tests, stop on first failure
+	$(PYTEST) tests/unit/ -v -x
 
 # ============================================================
 # Infrastructure (Docker)
